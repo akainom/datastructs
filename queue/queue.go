@@ -7,7 +7,6 @@ import (
 )
 
 type Queue[T any] struct {
-	len     uint16
 	m       *sync.RWMutex
 	arr     []T
 	compare func(a, b T) bool
@@ -15,7 +14,6 @@ type Queue[T any] struct {
 
 func NewQueue[T any]() *Queue[T] {
 	return &Queue[T]{
-		len:     0,
 		m:       &sync.RWMutex{},
 		arr:     make([]T, 0),
 		compare: compare.DefaultCompare[T](),
@@ -23,13 +21,12 @@ func NewQueue[T any]() *Queue[T] {
 }
 
 func NewQueueFromSlice[T any](s []T) *Queue[T] {
-	maxSize := 65535
+	maxSize := 4294967295
 	if len(s) > maxSize {
 		s = s[:maxSize]
 	}
 
 	q := NewQueue[T]()
-	q.len = uint16(len(s))
 	q.arr = s
 
 	return q
@@ -39,12 +36,11 @@ func (q *Queue[T]) Push(val T) error {
 	q.m.Lock()
 	defer q.m.Unlock()
 
-	if q.len > 65534 {
+	if len(q.arr) > 4294967294 {
 		return err.ErrorOverflow
 	}
 
 	q.arr = append(q.arr, val)
-	q.len++
 	return nil
 }
 
@@ -52,14 +48,13 @@ func (q *Queue[T]) Pop() (T, error) {
 	q.m.Lock()
 	defer q.m.Unlock()
 
-	if q.len < 1 {
+	if len(q.arr) == 0 {
 		var zero T
 		return zero, err.ErrorEmpty
 	}
 
 	val := q.arr[0]
 	q.arr = q.arr[1:]
-	q.len--
 	return val, nil
 }
 
@@ -67,7 +62,7 @@ func (q *Queue[T]) Front() (T, error) {
 	q.m.RLock()
 	defer q.m.RUnlock()
 
-	if q.len < 1 {
+	if len(q.arr) == 0 {
 		var zero T
 		return zero, err.ErrorEmpty
 	}
@@ -75,22 +70,18 @@ func (q *Queue[T]) Front() (T, error) {
 	return q.arr[0], nil
 }
 
-func (q *Queue[T]) Len() uint16 {
+func (q *Queue[T]) Len() int {
 	q.m.RLock()
 	defer q.m.RUnlock()
 
-	return q.len
+	return len(q.arr)
 }
 
 func (q *Queue[T]) IsEmpty() bool {
 	q.m.RLock()
 	defer q.m.RUnlock()
 
-	if q.len < 1 {
-		return true
-	}
-
-	return false
+	return len(q.arr) == 0
 }
 
 func (q *Queue[T]) Exists(target T) bool {
@@ -111,15 +102,14 @@ func (q *Queue[T]) Clear() {
 	defer q.m.Unlock()
 
 	q.arr = make([]T, 0)
-	q.len = 0
 }
 
 func (q *Queue[T]) ToSlice() []T {
 	q.m.RLock()
 	defer q.m.RUnlock()
 
-	slice := make([]T, 0, q.len)
-	slice = append(slice, q.arr...)
+	slice := make([]T, len(q.arr))
+	copy(slice, q.arr)
 
 	return slice
 }

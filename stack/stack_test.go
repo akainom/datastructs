@@ -14,10 +14,6 @@ func TestNewStack(t *testing.T) {
 		t.Error("NewStack() returned nil")
 	}
 
-	if s.len != 0 {
-		t.Errorf("Expected s.len to be 0, got %d", s.len)
-	}
-
 	if s.arr == nil {
 		t.Error("Expected s.arr to be initialized, got nil")
 	}
@@ -39,10 +35,6 @@ func TestNewStackFromSlice(t *testing.T) {
 		t.Error("NewStackFromSlice() returned nil")
 	}
 
-	if s.len != 4 {
-		t.Errorf("Expected s.len to be 4, got %d", s.len)
-	}
-
 	if len(s.arr) != 4 {
 		t.Errorf("Expected len(s.arr) to be 4, got %d", len(s.arr))
 	}
@@ -62,8 +54,8 @@ func TestNewStackFromSlice(t *testing.T) {
 		}
 	}
 
-	if s.len != 0 {
-		t.Errorf("Expected s.len to be 0 after all pops, got %d", s.len)
+	if len(s.arr) != 0 {
+		t.Errorf("Expected len(s.arr) to be 0 after all pops, got %d", len(s.arr))
 	}
 
 	strslice := []string{"c", "b", "a"}
@@ -81,9 +73,6 @@ func TestNewStackFromSlice(t *testing.T) {
 	}
 
 	empty := NewStackFromSlice([]int{})
-	if empty.len != 0 {
-		t.Errorf("Expected len=0 for empty slice, got %d", empty.len)
-	}
 	if len(empty.arr) != 0 {
 		t.Errorf("Expected arr length=0 for empty slice, got %d", len(empty.arr))
 	}
@@ -93,11 +82,8 @@ func TestNewStackFromSlice(t *testing.T) {
 		bigSlice[i] = i
 	}
 	bigStack := NewStackFromSlice(bigSlice)
-	if bigStack.len != 65535 {
-		t.Errorf("Expected len=65535 (max), got %d", bigStack.len)
-	}
 	if len(bigStack.arr) != 65535 {
-		t.Errorf("Expected arr length=65535, got %d", len(bigStack.arr))
+		t.Errorf("Expected arr length=65535 (max), got %d", len(bigStack.arr))
 	}
 	if bigStack.arr[0] != 0 {
 		t.Errorf("Expected first element 0, got %v", bigStack.arr[0])
@@ -114,9 +100,6 @@ func TestPush(t *testing.T) {
 	if err != nil {
 		t.Errorf("Push() unexpected error: %v", err)
 	}
-	if s.len != 1 {
-		t.Errorf("Expected len=1, got %d", s.len)
-	}
 	if len(s.arr) != 1 {
 		t.Errorf("Expected arr length=1, got %d", len(s.arr))
 	}
@@ -127,9 +110,6 @@ func TestPush(t *testing.T) {
 	err = s.Push(100)
 	if err != nil {
 		t.Errorf("Push() unexpected error: %v", err)
-	}
-	if s.len != 2 {
-		t.Errorf("Expected len=2, got %d", s.len)
 	}
 	if len(s.arr) != 2 {
 		t.Errorf("Expected arr length=2, got %d", len(s.arr))
@@ -142,8 +122,8 @@ func TestPush(t *testing.T) {
 	if err != nil {
 		t.Errorf("Push() unexpected error: %v", err)
 	}
-	if s.len != 3 {
-		t.Errorf("Expected len=3, got %d", s.len)
+	if len(s.arr) != 3 {
+		t.Errorf("Expected arr length=3, got %d", len(s.arr))
 	}
 	if s.arr[2] != 200 {
 		t.Errorf("Expected arr[2]=200, got %v", s.arr[2])
@@ -160,16 +140,16 @@ func TestPushOverflow(t *testing.T) {
 		}
 	}
 
-	if s.len != 65535 {
-		t.Errorf("Expected len=65535, got %d", s.len)
+	if len(s.arr) != 65535 {
+		t.Errorf("Expected len(s.arr)=65535, got %d", len(s.arr))
 	}
 
 	err := s.Push(65535)
 	if err != errors.ErrorOverflow {
 		t.Errorf("Expected ErrorOverflow, got %v", err)
 	}
-	if s.len != 65535 {
-		t.Errorf("Expected len still 65535, got %d", s.len)
+	if len(s.arr) != 65535 {
+		t.Errorf("Expected len(s.arr) still 65535, got %d", len(s.arr))
 	}
 }
 
@@ -187,9 +167,6 @@ func TestPop(t *testing.T) {
 		}
 	}
 
-	if s.len != 0 {
-		t.Errorf("Expected len=0 after all pops, got %d", s.len)
-	}
 	if len(s.arr) != 0 {
 		t.Errorf("Expected arr length=0 after all pops, got %d", len(s.arr))
 	}
@@ -215,9 +192,6 @@ func TestTop(t *testing.T) {
 		t.Errorf("Expected Top()=3, got %v", val)
 	}
 
-	if s.len != 3 {
-		t.Errorf("Expected len=3 after Top(), got %d", s.len)
-	}
 	if len(s.arr) != 3 {
 		t.Errorf("Expected arr length=3 after Top(), got %d", len(s.arr))
 	}
@@ -231,10 +205,6 @@ func TestTop(t *testing.T) {
 	val, err = empty.Top()
 	if err != errors.ErrorEmpty {
 		t.Errorf("Expected ErrorEmpty from empty stack, got %v", err)
-	}
-	var zero int
-	if val != zero {
-		t.Errorf("Expected zero value (0), got %v", val)
 	}
 }
 
@@ -295,18 +265,12 @@ func TestIsEmpty(t *testing.T) {
 func TestClear(t *testing.T) {
 	s := NewStackFromSlice([]int{1, 2, 3, 4, 5})
 
-	if s.len != 5 {
-		t.Errorf("Expected len=5 before Clear, got %d", s.len)
-	}
 	if len(s.arr) != 5 {
 		t.Errorf("Expected arr length=5 before Clear, got %d", len(s.arr))
 	}
 
 	s.Clear()
 
-	if s.len != 0 {
-		t.Errorf("Expected len=0 after Clear, got %d", s.len)
-	}
 	if len(s.arr) != 0 {
 		t.Errorf("Expected arr length=0 after Clear, got %d", len(s.arr))
 	}
@@ -338,9 +302,6 @@ func TestSetTop(t *testing.T) {
 		t.Errorf("Expected Top()=100 after SetTop, got %v", val)
 	}
 
-	if s.len != 3 {
-		t.Errorf("Expected len=3 after SetTop, got %d", s.len)
-	}
 	if len(s.arr) != 3 {
 		t.Errorf("Expected arr length=3 after SetTop, got %d", len(s.arr))
 	}
@@ -430,9 +391,6 @@ func TestToSlice(t *testing.T) {
 		t.Errorf("Expected %v, got %v", expected, result)
 	}
 
-	if s.len != 4 {
-		t.Errorf("Expected len=4 after ToSlice, got %d", s.len)
-	}
 	if len(s.arr) != 4 {
 		t.Errorf("Expected arr length=4 after ToSlice, got %d", len(s.arr))
 	}

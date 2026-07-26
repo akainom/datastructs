@@ -1,7 +1,7 @@
 package list
 
 import (
-	"datastructs/compare"
+	cmp "datastructs/compare"
 	err "datastructs/errors"
 	"sync"
 )
@@ -13,27 +13,27 @@ type ListNode[T any] struct {
 }
 
 type List[T any] struct {
-	m           *sync.RWMutex
-	len         uint16
-	Head        *ListNode[T]
-	Tail        *ListNode[T]
-	compareFunc func(a, b T) bool
+	m       *sync.RWMutex
+	len     uint32
+	Head    *ListNode[T]
+	Tail    *ListNode[T]
+	compare func(a, b T) bool
 }
 
 func NewList[T any]() *List[T] {
 	return &List[T]{
-		m:           &sync.RWMutex{},
-		len:         0,
-		Head:        nil,
-		Tail:        nil,
-		compareFunc: compare.DefaultCompare[T](),
+		m:       &sync.RWMutex{},
+		len:     0,
+		Head:    nil,
+		Tail:    nil,
+		compare: cmp.DefaultCompare[T](),
 	}
 }
 
 func NewListFromSlice[T any](s []T) *List[T] {
 	list := NewList[T]()
 
-	maxSize := 65535
+	maxSize := 4294967295
 	if len(s) > maxSize {
 		s = s[:maxSize]
 	}
@@ -70,7 +70,7 @@ func (l *List[T]) Append(val T) error {
 	l.m.Lock()
 	defer l.m.Unlock()
 
-	if l.len > 65534 {
+	if l.len > 4294967294 {
 		return err.ErrorOverflow
 	}
 
@@ -122,7 +122,7 @@ func (l *List[T]) Get(target T) (*ListNode[T], error) {
 
 	var current = l.Head
 	for current != nil {
-		if l.compareFunc(current.Val, target) {
+		if l.compare(current.Val, target) {
 			return current, nil
 		}
 		current = current.Next
@@ -144,7 +144,7 @@ func (l *List[T]) Set(target T, val T) (int, error) {
 		chgCount = 0
 	)
 	for current != nil {
-		if l.compareFunc(current.Val, target) {
+		if l.compare(current.Val, target) {
 			chgCount++
 			current.Val = val
 		}
@@ -170,7 +170,7 @@ func (l *List[T]) Last() (*ListNode[T], error) {
 
 }
 
-func (l *List[T]) Len() uint16 {
+func (l *List[T]) Len() uint32 {
 	l.m.RLock()
 	defer l.m.RUnlock()
 
@@ -215,5 +215,5 @@ func (l *List[T]) SetCompareFunc(cmp func(a, b T) bool) {
 	l.m.Lock()
 	defer l.m.Unlock()
 
-	l.compareFunc = cmp
+	l.compare = cmp
 }

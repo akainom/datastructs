@@ -63,7 +63,7 @@ func TestAppend(t *testing.T) {
 	}
 
 	l.Clear()
-	for range 65535 {
+	for range 4294967295 {
 		l.Append(1)
 	}
 
@@ -99,14 +99,14 @@ func TestNewListFromSlice(t *testing.T) {
 		current = current.Next
 	}
 
-	overflow := make([]int, 0, 65536)
-	for i := range 65536 {
+	overflow := make([]int, 0, 4294967296)
+	for i := range 4294967296 {
 		overflow = append(overflow, i)
 	}
 
 	l3 := NewListFromSlice(overflow)
-	if l3.len != 65535 {
-		t.Errorf("Expected len to be max(65535), got %v", l3.len)
+	if l3.len != 4294967295 {
+		t.Errorf("Expected len to be max(4294967295), got %v", l3.len)
 	}
 }
 
@@ -316,7 +316,7 @@ func TestToSlice(t *testing.T) {
 		t.Errorf("Expected %v, got %v", input, result)
 	}
 
-	if l.Len() != uint16(len(input)) {
+	if l.Len() != uint32(len(input)) {
 		t.Errorf("Expected len=%d, got %d", len(input), l.Len())
 	}
 }

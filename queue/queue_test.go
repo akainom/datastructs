@@ -13,16 +13,16 @@ func TestNewQueue(t *testing.T) {
 		t.Error("NewQueue() returned nil")
 	}
 
-	if s.len != 0 {
-		t.Errorf("Expected s.len to be 0, got %d", s.len)
-	}
-
 	if s.arr == nil {
 		t.Error("Expected s.arr to be initialized, got nil")
 	}
 
 	if len(s.arr) != 0 {
 		t.Errorf("Expected len(s.arr) to be 0, got %d", len(s.arr))
+	}
+
+	if s.m == nil {
+		t.Error("Expected s.m to be initialized, got nil")
 	}
 }
 
@@ -34,8 +34,8 @@ func TestNewQueueFromSlice(t *testing.T) {
 		t.Error("NewQueueFromSlice() returned nil")
 	}
 
-	if q.len != 4 {
-		t.Errorf("Expected s.len to be 4, got %d", q.len)
+	if len(q.arr) != 4 {
+		t.Errorf("Expected len(q.arr) to be 4, got %d", len(q.arr))
 	}
 
 	if val, _ := q.Front(); val != 4 {
@@ -53,8 +53,8 @@ func TestNewQueueFromSlice(t *testing.T) {
 		}
 	}
 
-	if q.len != 0 {
-		t.Errorf("Expected s.len to be 0 after all pops, got %d", q.len)
+	if len(q.arr) != 0 {
+		t.Errorf("Expected len(q.arr) to be 0 after all pops, got %d", len(q.arr))
 	}
 
 	strslice := []string{"c", "b", "a"}
@@ -72,9 +72,6 @@ func TestNewQueueFromSlice(t *testing.T) {
 	}
 
 	empty := NewQueueFromSlice([]int{})
-	if empty.len != 0 {
-		t.Errorf("Expected len=0 for empty slice, got %d", empty.len)
-	}
 	if len(empty.arr) != 0 {
 		t.Errorf("Expected arr length=0 for empty slice, got %d", len(empty.arr))
 	}
@@ -84,11 +81,8 @@ func TestNewQueueFromSlice(t *testing.T) {
 		bigSlice[i] = i
 	}
 	bigQueue := NewQueueFromSlice(bigSlice)
-	if bigQueue.len != 65535 {
-		t.Errorf("Expected len=65535 (max), got %d", bigQueue.len)
-	}
 	if len(bigQueue.arr) != 65535 {
-		t.Errorf("Expected arr length=65535, got %d", len(bigQueue.arr))
+		t.Errorf("Expected arr length=65535 (max), got %d", len(bigQueue.arr))
 	}
 	if bigQueue.arr[0] != 0 {
 		t.Errorf("Expected first element 0, got %v", bigQueue.arr[0])
@@ -96,40 +90,33 @@ func TestNewQueueFromSlice(t *testing.T) {
 	if bigQueue.arr[65534] != 65534 {
 		t.Errorf("Expected last element 65534, got %v", bigQueue.arr[65534])
 	}
-
 }
 
 func TestPush(t *testing.T) {
 	s := NewQueue[int]()
 
 	s.Push(42)
-	if s.len != 1 {
-		t.Errorf("Expected len=1, got %d", s.len)
-	}
 	if len(s.arr) != 1 {
-		t.Errorf("Expected items length=1, got %d", len(s.arr))
+		t.Errorf("Expected arr length=1, got %d", len(s.arr))
 	}
 	if s.arr[0] != 42 {
-		t.Errorf("Expected items[0]=42, got %v", s.arr[0])
+		t.Errorf("Expected arr[0]=42, got %v", s.arr[0])
 	}
 
 	s.Push(100)
-	if s.len != 2 {
-		t.Errorf("Expected len=2, got %d", s.len)
-	}
 	if len(s.arr) != 2 {
-		t.Errorf("Expected items length=2, got %d", len(s.arr))
+		t.Errorf("Expected arr length=2, got %d", len(s.arr))
 	}
 	if s.arr[1] != 100 {
-		t.Errorf("Expected items[1]=100, got %v", s.arr[1])
+		t.Errorf("Expected arr[1]=100, got %v", s.arr[1])
 	}
 
 	s.Push(200)
-	if s.len != 3 {
-		t.Errorf("Expected len=3, got %d", s.len)
+	if len(s.arr) != 3 {
+		t.Errorf("Expected arr length=3, got %d", len(s.arr))
 	}
 	if s.arr[2] != 200 {
-		t.Errorf("Expected items[2]=200, got %v", s.arr[2])
+		t.Errorf("Expected arr[2]=200, got %v", s.arr[2])
 	}
 }
 
@@ -143,16 +130,16 @@ func TestPushOverflow(t *testing.T) {
 		}
 	}
 
-	if q.len != 65535 {
-		t.Errorf("Expected len=65535, got %d", q.len)
+	if len(q.arr) != 65535 {
+		t.Errorf("Expected len(q.arr)=65535, got %d", len(q.arr))
 	}
 
 	err := q.Push(65535)
 	if err != errors.ErrorOverflow {
 		t.Errorf("Expected ErrorOverflow, got %v", err)
 	}
-	if q.len != 65535 {
-		t.Errorf("Expected len still 65535, got %d", q.len)
+	if len(q.arr) != 65535 {
+		t.Errorf("Expected len(q.arr) still 65535, got %d", len(q.arr))
 	}
 }
 
@@ -170,15 +157,16 @@ func TestPop(t *testing.T) {
 		}
 	}
 
-	if s.len != 0 {
-		t.Errorf("Expected len=0 after all pops, got %d", s.len)
+	if len(s.arr) != 0 {
+		t.Errorf("Expected arr length=0 after all pops, got %d", len(s.arr))
 	}
 
 	val, err := s.Pop()
 	if err != errors.ErrorEmpty {
-		t.Errorf("Expected ErrEmpty, got %v", err)
+		t.Errorf("Expected ErrorEmpty, got %v", err)
 	}
-	if val != 0 {
+	var zero int
+	if val != zero {
 		t.Errorf("Expected zero value (0), got %v", val)
 	}
 }
@@ -195,26 +183,19 @@ func TestFront(t *testing.T) {
 		t.Errorf("Expected Front()=1, got %v", val)
 	}
 
-	if q.len != 3 {
-		t.Errorf("Expected len=3 after Front(), got %d", q.len)
-	}
-
 	if len(q.arr) != 3 {
 		t.Errorf("Expected arr length=3 after Front(), got %d", len(q.arr))
 	}
 
 	popped, _ := q.Pop()
 	if popped != 1 {
-		t.Errorf("Expected Pop()=3 after Front(), got %v", popped)
+		t.Errorf("Expected Pop()=1 after Front(), got %v", popped)
 	}
 
 	empty := NewQueue[int]()
 	val, err = empty.Front()
 	if err != errors.ErrorEmpty {
-		t.Errorf("Expected ErrEmpty from empty queue, got %v", err)
-	}
-	if val != 0 {
-		t.Errorf("Expected zero value (0), got %v", val)
+		t.Errorf("Expected ErrorEmpty from empty queue, got %v", err)
 	}
 }
 
@@ -251,9 +232,10 @@ func TestExists(t *testing.T) {
 
 	empty := NewQueue[int]()
 	if empty.Exists(42) {
-		t.Error("Expected Exists(42) to be false for empty stack")
+		t.Error("Expected Exists(42) to be false for empty queue")
 	}
 }
+
 func TestLen(t *testing.T) {
 	q := NewQueue[int]()
 
@@ -311,15 +293,12 @@ func TestIsEmpty(t *testing.T) {
 func TestClear(t *testing.T) {
 	q := NewQueueFromSlice([]int{1, 2, 3, 4, 5})
 
-	if q.len != 5 {
-		t.Errorf("Expected len=5 before Clear, got %d", q.len)
+	if len(q.arr) != 5 {
+		t.Errorf("Expected arr length=5 before Clear, got %d", len(q.arr))
 	}
 
 	q.Clear()
 
-	if q.len != 0 {
-		t.Errorf("Expected len=0 after Clear, got %d", q.len)
-	}
 	if len(q.arr) != 0 {
 		t.Errorf("Expected arr length=0 after Clear, got %d", len(q.arr))
 	}
@@ -329,12 +308,12 @@ func TestClear(t *testing.T) {
 
 	_, err := q.Pop()
 	if err != errors.ErrorEmpty {
-		t.Errorf("Expected ErrEmpty after Clear, got %v", err)
+		t.Errorf("Expected ErrorEmpty after Clear, got %v", err)
 	}
 
 	_, err = q.Front()
 	if err != errors.ErrorEmpty {
-		t.Errorf("Expected ErrEmpty after Clear, got %v", err)
+		t.Errorf("Expected ErrorEmpty after Clear, got %v", err)
 	}
 }
 
@@ -353,9 +332,6 @@ func TestToSlice(t *testing.T) {
 		t.Errorf("Expected %v, got %v", expected, result)
 	}
 
-	if q.len != 4 {
-		t.Errorf("Expected len=4 after ToSlice, got %d", q.len)
-	}
 	if len(q.arr) != 4 {
 		t.Errorf("Expected arr length=4 after ToSlice, got %d", len(q.arr))
 	}
