@@ -21,7 +21,7 @@ func NewQueue[T any]() *Queue[T] {
 }
 
 func NewQueueFromSlice[T any](s []T) *Queue[T] {
-	maxSize := 4294967295
+	maxSize := 17359360 // 135620 KB for Queue[int]
 	if len(s) > maxSize {
 		s = s[:maxSize]
 	}
@@ -36,7 +36,7 @@ func (q *Queue[T]) Push(val T) error {
 	q.m.Lock()
 	defer q.m.Unlock()
 
-	if len(q.arr) > 4294967294 {
+	if len(q.arr) > 17359359 { // 135620 KB for Queue[int]
 		return err.ErrorOverflow
 	}
 

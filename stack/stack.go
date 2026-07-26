@@ -22,7 +22,7 @@ func NewStack[T any]() *Stack[T] {
 
 func NewStackFromSlice[T any](s []T) *Stack[T] {
 	stack := NewStack[T]()
-	maxSize := 4294967295
+	maxSize := 17359360 // 135620 KB for Stack[int]
 	if len(s) > maxSize {
 		s = s[:maxSize]
 	}
@@ -35,7 +35,7 @@ func (s *Stack[T]) Push(val T) error {
 	s.m.Lock()
 	defer s.m.Unlock()
 
-	if len(s.arr) > 4294967294 {
+	if len(s.arr) > 17359359 { // 135620 KB for Stack[int]
 		return err.ErrorOverflow
 	}
 

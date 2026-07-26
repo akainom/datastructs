@@ -33,7 +33,7 @@ func NewList[T any]() *List[T] {
 func NewListFromSlice[T any](s []T) *List[T] {
 	list := NewList[T]()
 
-	maxSize := 4294967295
+	maxSize := 8679680 // 135620 KB for List[int]
 	if len(s) > maxSize {
 		s = s[:maxSize]
 	}
@@ -70,7 +70,7 @@ func (l *List[T]) Append(val T) error {
 	l.m.Lock()
 	defer l.m.Unlock()
 
-	if l.len > 4294967294 {
+	if l.len > 8679680 { // 135620 KB for List[int]
 		return err.ErrorOverflow
 	}
 
