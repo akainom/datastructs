@@ -70,7 +70,7 @@ func (l *List[T]) Append(val T) error {
 	l.m.Lock()
 	defer l.m.Unlock()
 
-	if l.len > 8679680 { // 135620 KB for List[int]
+	if l.len > 8679679 { // 135620 KB for List[int]
 		return err.ErrorOverflow
 	}
 
@@ -156,6 +156,17 @@ func (l *List[T]) Set(target T, val T) (int, error) {
 	}
 
 	return chgCount, nil
+}
+
+func (l *List[T]) First() (*ListNode[T], error) {
+	l.m.RLock()
+	defer l.m.RUnlock()
+
+	if l.len < 1 {
+		return nil, err.ErrorEmpty
+	}
+
+	return l.Head, nil
 }
 
 func (l *List[T]) Last() (*ListNode[T], error) {

@@ -220,6 +220,24 @@ func TestSet(t *testing.T) {
 	}
 }
 
+func TestFirst(t *testing.T) {
+	l := NewListFromSlice([]any{1, 2, 3})
+
+	node, err := l.First()
+	if err != nil {
+		t.Errorf("First() unexpected error: %v", err)
+	}
+	if node.Val != 1 {
+		t.Errorf("Expected 1, got %v", node.Val)
+	}
+
+	empty := NewList[any]()
+	_, err = empty.First()
+	if err != errors.ErrorEmpty {
+		t.Errorf("Expected ErrorEmpty, got %v", err)
+	}
+}
+
 func TestLast(t *testing.T) {
 	l := NewListFromSlice([]any{1, 2, 3})
 
